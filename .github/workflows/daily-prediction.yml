@@ -1,8 +1,5 @@
 name: Daily Prediction Pipeline
 
-# Runs once per trading day, after US market close.
-# 21:30 UTC = 4:30pm ET (market close) + buffer, Mon–Fri.
-# Adjust the cron for daylight saving as needed, or trigger manually.
 on:
   schedule:
     - cron: "30 21 * * 1-5"
