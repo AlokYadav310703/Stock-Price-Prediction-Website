@@ -27,9 +27,26 @@ if not logging.getLogger().handlers:
 
 logger = logging.getLogger("app.jobs")
 
+_db_initialized = False
+
+
+def _ensure_db_initialized():
+    """Standalone job scripts never import app.main, so the FastAPI startup
+    event that normally calls init_db() never runs. Call it here instead,
+    once per process, so a fresh database (e.g. a newly created Postgres
+    instance with no tables yet) gets its schema created automatically
+    before any job tries to write to it."""
+    global _db_initialized
+    if not _db_initialized:
+        from app.database import init_db
+
+        init_db()
+        _db_initialized = True
+
 
 @contextmanager
 def job_run(job_name: str):
+    _ensure_db_initialized()
     logger.info("Starting job '%s'...", job_name)
 
     # Setup (creating the JobRun row itself) can fail — most commonly a bad
