@@ -1,0 +1,76 @@
+# ═══════════════════════════════════════════════════════════════════════
+# AAPL Prediction & Monitoring — root .gitignore
+# Place this file at the project root (same level as backend/ and frontend/)
+# ═══════════════════════════════════════════════════════════════════════
+
+# ── Backend (Python) ─────────────────────────────────────────────────────
+# Virtual environments — rebuilt via `pip install -r requirements.txt`.
+# This alone is usually multiple GB (TensorFlow etc.) and must never be committed.
+backend/.venv/
+backend/venv/
+backend/env/
+.venv/
+venv/
+
+# Python bytecode cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Local secrets — real values live only in your local .env and in
+# GitHub Actions Secrets, never in the repo. .env.example IS committed.
+backend/.env
+frontend/.env
+.env
+.env.local
+
+# Local SQLite database and its journal/temp files (dev only —
+# production uses a real Postgres via DATABASE_URL)
+backend/*.db
+backend/*.sqlite3
+backend/*.db-journal
+backend/*.db-wal
+backend/*.db-shm
+
+# Downloaded ChromaDB collection cache — re-fetched automatically by the
+# app on first run; large (hundreds of MB) and machine-specific.
+backend/.cache/
+.cache/
+
+# Log files (if you redirect job/server output to files locally)
+backend/*.log
+*.log
+
+# ── Frontend (Node) ──────────────────────────────────────────────────────
+# Reinstalled via `npm install` — do not commit.
+frontend/node_modules/
+node_modules/
+
+# Build output — regenerated via `npm run build`.
+frontend/dist/
+dist/
+
+# Vite/npm cache and debug logs
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS / editor cruft ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# ── Model files ────────────────────────────────────────────────────────
+# IMPORTANT: model files (models/*.keras, models/*.pkl) are INTENTIONALLY
+# NOT excluded above — they must be committed so GitHub Actions (which
+# runs on a fresh checkout with no access to your local machine) can find
+# them. If any single model file exceeds GitHub's 100MB limit, use Git LFS
+# instead of trying to gitignore around it:
+#   git lfs install
+#   git lfs track "models/*.keras" "models/*.pkl"
+#   git add .gitattributes

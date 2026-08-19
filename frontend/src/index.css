@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-ink-950;
+  }
+  body {
+    @apply bg-ink-950 text-paper font-sans antialiased;
+  }
+  .num {
+    @apply font-mono tabular-nums;
+  }
+  ::selection {
+    background: rgba(76, 126, 255, 0.35);
+  }
+  * {
+    scrollbar-color: #2a3244 transparent;
+    scrollbar-width: thin;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a3244;
+    border-radius: 999px;
+  }
+  :focus-visible {
+    outline: 2px solid #4c7eff;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .panel {
+    @apply bg-ink-800 border border-ink-600 rounded-xl shadow-panel;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-ticker {
+      animation: none !important;
+    }
+  }
+}
+
+/* Light theme: overrides the ink/paper scale in place so every panel,
+   sidebar and card built with the bg-ink and text-paper utilities repaints
+   without per-component variants. Signal/accent colors stay identical
+   across themes since they carry meaning (up/down/warn), not chrome. */
+.theme-light {
+  color-scheme: light;
+}
+.theme-light body,
+.theme-light.bg-ink-950,
+.theme-light .bg-ink-950 {
+  background-color: #F4F6F9 !important;
+}
+.theme-light .bg-ink-900 {
+  background-color: #FFFFFF !important;
+}
+.theme-light .bg-ink-800 {
+  background-color: #FFFFFF !important;
+}
+.theme-light .bg-ink-700,
+.theme-light .hover\:bg-ink-700:hover {
+  background-color: #EEF1F6 !important;
+}
+.theme-light .bg-ink-600,
+.theme-light .hover\:bg-ink-600:hover {
+  background-color: #E4E8F0 !important;
+}
+.theme-light .border-ink-600 {
+  border-color: #D8DEE9 !important;
+}
+.theme-light .text-paper {
+  color: #10151F !important;
+}
+.theme-light .text-paper-dim {
+  color: #5B6478 !important;
+}
+.theme-light .shadow-panel {
+  box-shadow: 0 1px 0 0 rgba(16, 21, 31, 0.02) inset, 0 8px 20px -14px rgba(16, 21, 31, 0.18) !important;
+}

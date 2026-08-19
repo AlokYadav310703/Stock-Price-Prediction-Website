@@ -1,0 +1,16 @@
+# Lightweight install for local API development, testing routes/DB/alerts/
+# monitoring math, and running the seed script — WITHOUT tensorflow/
+# chromadb/sentence-transformers. The daily_prediction job's real model
+# inference and news-similarity search need the full requirements.txt.
+fastapi==0.115.0
+uvicorn[standard]==0.31.0
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-dotenv==1.0.1
+SQLAlchemy==2.0.35
+pandas==2.2.3
+numpy==1.26.4
+scipy==1.13.1
+joblib==1.4.2
+requests==2.32.3
+yfinance==0.2.44
