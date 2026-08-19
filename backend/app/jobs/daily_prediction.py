@@ -12,6 +12,7 @@ FastAPI server, which free-tier hosts can't be relied on to keep alive.
 """
 import logging
 import sys
+import traceback
 
 from app.config import get_settings
 from app.jobs._runner import job_run
@@ -35,6 +36,7 @@ def main() -> int:
             )
         return 0
     except Exception:
+        logger.error("daily_prediction job aborted:\n%s", traceback.format_exc())
         return 1
 
 

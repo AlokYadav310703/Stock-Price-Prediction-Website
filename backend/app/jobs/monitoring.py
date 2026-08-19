@@ -10,6 +10,7 @@ once per trading day after daily_prediction.py and update_actual_prices.py.
 """
 import logging
 import sys
+import traceback
 
 from app.config import get_settings
 from app.jobs._runner import job_run
@@ -50,6 +51,7 @@ def main() -> int:
             logger.info("Monitoring job completed: %d check group(s) run.", checks_run)
         return 0
     except Exception:
+        logger.error("monitoring job aborted:\n%s", traceback.format_exc())
         return 1
 
 

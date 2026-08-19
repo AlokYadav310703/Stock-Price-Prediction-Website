@@ -12,6 +12,7 @@ chains both).
 """
 import logging
 import sys
+import traceback
 
 from app.config import get_settings
 from app.jobs._runner import job_run
@@ -30,6 +31,7 @@ def main() -> int:
             logger.info("Updated %d prediction(s) with actual prices.", updated)
         return 0
     except Exception:
+        logger.error("update_actual_prices job aborted:\n%s", traceback.format_exc())
         return 1
 
 

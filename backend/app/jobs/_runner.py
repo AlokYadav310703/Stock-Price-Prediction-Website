@@ -4,23 +4,52 @@ SUCCESS/FAILED) so the /monitoring/health endpoint can report whether the
 latest scheduled job succeeded, and dispatches a CRITICAL alert on failure.
 """
 import logging
+import sys
 import traceback
 from contextlib import contextmanager
+from datetime import datetime
 
+from app.config import get_settings
 from app.database import SessionLocal
 from app.models.job_run import JobRun
-from app.monitoring.alerting import check_job_failure
+
+# Standalone job scripts (python -m app.jobs.X) never import app.main, so
+# logging.basicConfig() would otherwise never run and every logger.info/
+# error() call below would be silently dropped. Configure it here,
+# idempotently, so `python -m app.jobs.X` always produces visible output
+# both locally and in CI.
+if not logging.getLogger().handlers:
+    logging.basicConfig(
+        level=get_settings().LOG_LEVEL,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        stream=sys.stdout,
+    )
 
 logger = logging.getLogger("app.jobs")
 
 
 @contextmanager
 def job_run(job_name: str):
-    db = SessionLocal()
-    run = JobRun(job_name=job_name, status="RUNNING")
-    db.add(run)
-    db.commit()
-    db.refresh(run)
+    logger.info("Starting job '%s'...", job_name)
+
+    # Setup (creating the JobRun row itself) can fail — most commonly a bad
+    # or unreachable DATABASE_URL. That must NOT fail silently: log it with
+    # a full traceback before re-raising, since this happens before the
+    # try/except below even exists.
+    try:
+        db = SessionLocal()
+        run = JobRun(job_name=job_name, status="RUNNING")
+        db.add(run)
+        db.commit()
+        db.refresh(run)
+    except Exception:
+        logger.error(
+            "Job '%s' failed during setup (could not create JobRun row — check "
+            "DATABASE_URL is correct and reachable):\n%s",
+            job_name,
+            traceback.format_exc(),
+        )
+        raise
 
     result = {"records_processed": 0}
     try:
@@ -33,13 +62,13 @@ def job_run(job_name: str):
         run.error_message = str(exc)
         logger.error("Job '%s' failed: %s\n%s", job_name, exc, traceback.format_exc())
         try:
+            from app.monitoring.alerting import check_job_failure
+
             check_job_failure(db, job_name, str(exc))
         except Exception:
             logger.error("Additionally failed to record the job-failure alert.")
         raise
     finally:
-        from datetime import datetime
-
         run.finished_at = datetime.utcnow()
         db.commit()
         db.close()
