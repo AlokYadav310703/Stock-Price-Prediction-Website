@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     # ── Stock / data source ───────────────────────────────────────────
     STOCK_SYMBOL: str = "AAPL"
     STOCK_NAME: str = "Apple Inc."
-    NEWS_API_KEY: str = ""
+    NEWS_API_KEY: str = "1671260b3d8341d59df512e6cd64224f"
 
     # ── ChromaDB / HuggingFace (news similarity) ──────────────────────
     HF_REPO_ID: str = "alokyadav310703/Similarity"
