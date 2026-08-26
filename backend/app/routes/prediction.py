@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.ml.news_service import get_aggregated_news_features
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -43,10 +42,6 @@ def get_latest_prediction(db: Session = Depends(get_db)):
 def get_latest_prediction_detail(db: Session = Depends(get_db)):
     latest = _latest_two(db)[0]
 
-    news_features, similar_events = get_aggregated_news_features(
-        top_k=3
-    )
-
     expected_move_pct = ((latest.predicted_price - latest.base_price) / latest.base_price) * 100 if latest.base_price else 0.0
     if expected_move_pct > 2:
         recommendation = "STRONG BUY"
@@ -69,55 +64,14 @@ def get_latest_prediction_detail(db: Session = Depends(get_db)):
         final_prediction=latest.predicted_price,
         correction=latest.correction,
         news_features=NewsFeatures(
-            sentiment_score=round(latest.sentiment_score, 2),
-            impact_score=round(latest.impact_score, 2),
-            event_weight=round(latest.event_weight, 2),
+            sentiment_score=round(latest.sentiment_score,2),
+            impact_score=round(latest.impact_score,2),
+            event_weight=round(latest.event_weight,2),
             news_count=latest.news_count,
             has_supply_chain_event=int(latest.has_supply_chain_event) if latest.has_supply_chain_event is not None else None,
         ),
         market_returns=MarketReturns(return_1d=latest.return_1d, return_5d=latest.return_5d),
         expected_move_pct=round(expected_move_pct, 2),
         recommendation=recommendation,
-        similar_events=similar_events,  # similarity results aren't persisted per-row; see /prediction/latest for stored detail
+        similar_events=[],  # similarity results aren't persisted per-row; see /prediction/latest for stored detail
     )
-
-
-
-# @router.get("/latest/detail", response_model=PredictionDetailOut)
-# def get_latest_prediction_detail(db: Session = Depends(get_db)):
-#     latest = _latest_two(db)[0]
-
-#     expected_move_pct = ((latest.predicted_price - latest.base_price) / latest.base_price) * 100 if latest.base_price else 0.0
-#     if expected_move_pct > 2:
-#         recommendation = "STRONG BUY"
-#     elif expected_move_pct > 0.5:
-#         recommendation = "BUY"
-#     elif expected_move_pct < -2:
-#         recommendation = "STRONG SELL"
-#     elif expected_move_pct < -0.5:
-#         recommendation = "SELL"
-#     else:
-#         recommendation = "HOLD"
-
-#     return PredictionDetailOut(
-#         prediction_date=latest.prediction_date,
-#         target_date=latest.target_date,
-#         model_version=latest.model_version,
-#         current_price=latest.base_price,
-#         stage1_prediction=latest.stage1_prediction,
-#         base_predictions=BasePredictions(lstm=latest.lstm_prediction, cnn=latest.cnn_prediction),
-#         final_prediction=latest.predicted_price,
-#         correction=latest.correction,
-#         news_features=NewsFeatures(
-#             sentiment_score=latest.sentiment_score,
-#             impact_score=latest.impact_score,
-#             event_weight=latest.event_weight,
-#             news_count=latest.news_count,
-#             has_supply_chain_event=int(latest.has_supply_chain_event) if latest.has_supply_chain_event is not None else None,
-#         ),
-#         market_returns=MarketReturns(return_1d=latest.return_1d, return_5d=latest.return_5d),
-#         expected_move_pct=round(expected_move_pct, 2),
-#         recommendation=recommendation,
-#         similar_events=[],  # similarity results aren't persisted per-row; see /prediction/latest for stored detail
-#     )
-
