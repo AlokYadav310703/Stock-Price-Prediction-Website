@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from app.ml.news_service import get_aggregated_news_features
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
