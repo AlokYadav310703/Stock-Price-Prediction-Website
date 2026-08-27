@@ -10,7 +10,7 @@ import * as mock from './mockData'
 const USE_MOCK = (import.meta.env.VITE_USE_MOCK_DATA ?? 'true') !== 'false'
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
 
-const http = axios.create({ baseURL: BASE_URL, timeout: 15000 })
+const http = axios.create({ baseURL: BASE_URL, timeout: 60000 })
 
 // Simulated network latency so loading states are visible/testable in the mock build.
 const delay = (ms = 350) => new Promise((res) => setTimeout(res, ms))
