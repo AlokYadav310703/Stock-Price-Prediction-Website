@@ -86,9 +86,9 @@ def get_latest_prediction_detail(db: Session = Depends(get_db)):
         final_prediction=latest.predicted_price,
         correction=latest.correction,
         news_features=NewsFeatures(
-            sentiment_score=latest.sentiment_score,
-            impact_score=latest.impact_score,
-            event_weight=latest.event_weight,
+            sentiment_score=round(latest.sentiment_score,2),
+            impact_score=round(latest.impact_score,2),
+            event_weight=round(latest.event_weight,2),
             news_count=latest.news_count,
             has_supply_chain_event=int(latest.has_supply_chain_event) if latest.has_supply_chain_event is not None else None,
         ),
