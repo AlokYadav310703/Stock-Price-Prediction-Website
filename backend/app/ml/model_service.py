@@ -116,6 +116,22 @@ def prepare_ohlc_window(df, scaler, lookback: int) -> np.ndarray:
     return scaled.reshape(1, lookback, 4)
 
 
+# def run_stage1(models: dict, df) -> tuple[float, dict]:
+#     lookback = models["lstm"].input_shape[1]
+#     ohlc_lstm = prepare_ohlc_window(df, models["feature_scaler_raw"], lookback)
+#     ohlc_cnn = prepare_ohlc_window(df, models["feature_scaler"], lookback)
+
+#     lstm_scaled = models["lstm"].predict(ohlc_lstm, verbose=0)
+#     cnn_scaled = models["cnn"].predict(ohlc_cnn, verbose=0)
+#     meta_input = np.hstack([lstm_scaled, cnn_scaled])
+#     stage1_scaled = np.array(models["meta_learner"].predict(meta_input)).reshape(-1, 1)
+
+#     lstm_actual = float(models["target_scaler_raw"].inverse_transform(lstm_scaled)[0, 0])
+#     cnn_actual = float(models["target_scaler"].inverse_transform(cnn_scaled)[0, 0])
+#     stage1_actual = float(models["target_scaler"].inverse_transform(stage1_scaled)[0, 0])
+
+#     return stage1_actual, {"lstm": lstm_actual, "cnn": cnn_actual}
+
 def run_stage1(models: dict, df) -> tuple[float, dict]:
     lookback = models["lstm"].input_shape[1]
     ohlc_lstm = prepare_ohlc_window(df, models["feature_scaler_raw"], lookback)
@@ -130,7 +146,7 @@ def run_stage1(models: dict, df) -> tuple[float, dict]:
     cnn_actual = float(models["target_scaler"].inverse_transform(cnn_scaled)[0, 0])
     stage1_actual = float(models["target_scaler"].inverse_transform(stage1_scaled)[0, 0])
 
-    return stage1_actual, {"lstm": lstm_actual, "cnn": cnn_actual}
+    return cnn_actual, {"lstm": lstm_actual, "cnn": cnn_actual}
 
 
 def run_stage2(models: dict, stage1_actual: float, news_features: dict, market_returns: dict) -> tuple[float, float]:
