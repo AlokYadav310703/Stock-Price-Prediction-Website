@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./aapl_predictor.db"
 
     # ── CORS ───────────────────────────────────────────────────────────
-    CORS_ORIGINS: str = "http://localhost:5173"
+    # CORS_ORIGINS: str = "http://localhost:5173"
+    CORS_ORIGINS: str = ( "http://localhost:5173," "https://diutourism.vercel.app" )
 
     @property
     def cors_origins_list(self) -> List[str]:
